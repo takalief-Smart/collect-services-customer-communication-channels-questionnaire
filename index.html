@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان قنوات التواصل مع العملاء - تحصيل الدفعات والفواتير | تكاليف</title>
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #1e4a3b 0%, #2d6a4e 100%);
+            min-height: 100vh;
+            color: #1e3a3a;
+            padding: 20px;
+        }
+        
+        .main-header {
+            background: linear-gradient(135deg, #0e3b2c 0%, #1b5e3f 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-bottom: 3px solid #52b788;
+        }
+        
+        .company-badge {
+            background: rgba(82, 183, 136, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+            border: 1px solid #52b788;
+            color: white;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            margin-bottom: 2rem;
+            background-color: #f8faf8;
+            border: 1px solid #e4f2e4;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #1e4a3b 0%, #2d6a4e 100%);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-bottom: 2px solid #52b788;
+        }
+        
+        .btn-custom {
+            background: #52b788;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid #1e4a3b;
+        }
+        
+        .btn-custom:hover {
+            background: #2d6a4e;
+            transform: scale(1.05);
+            color: white;
+            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.4);
+        }
+        
+        .btn-excel {
+            background: #1e4a3b;
+            color: white;
+            border: 2px solid #52b788;
+        }
+        
+        .btn-excel:hover {
+            background: #2d6a4e;
+            color: white;
+        }
+        
+        .btn-pdf {
+            background: #4a6b5a;
+            color: white;
+            border: 2px solid #52b788;
+        }
+        
+        .btn-pdf:hover {
+            background: #1e4a3b;
+            color: white;
+        }
+        
+        .form-label {
+            color: #2d6a4e;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e4f2e4;
+            border-radius: 10px;
+            padding: 0.75rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #52b788;
+            box-shadow: 0 0 0 0.2rem rgba(82, 183, 136, 0.25);
+        }
+        
+        .data-entry-section {
+            background: #f0f7f0;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 3px solid #52b788;
+        }
+        
+        .client-info-card {
+            background: linear-gradient(135deg, #f8faf8 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid #52b788;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        
+        .client-info-title {
+            color: #1e4a3b;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .client-info-title i {
+            color: #52b788;
+            margin-left: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .required-field::after {
+            content: "*";
+            color: #dc3545;
+            margin-right: 4px;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #0e3b2c 0%, #1b5e3f 100%);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+            border-radius: 50px 50px 0 0;
+            border-top: 3px solid #52b788;
+        }
+        
+        .footer-links {
+            color: #e4f2e4;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links:hover {
+            color: #52b788;
+            padding-right: 5px;
+        }
+        
+        .contact-item {
+            margin-bottom: 10px;
+            color: #e4f2e4;
+        }
+        
+        .contact-item i {
+            color: #52b788;
+            margin-left: 10px;
+            width: 20px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(82, 183, 136, 0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            color: #52b788;
+            transition: all 0.3s ease;
+            border: 1px solid #52b788;
+        }
+        
+        .social-icon:hover {
+            background: #52b788;
+            color: #0e3b2c;
+            transform: translateY(-3px);
+        }
+        
+        .nav-tabs-custom {
+            border-bottom: 3px solid #52b788;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #1e4a3b 0%, #2d6a4e 100%);
+            border-radius: 50px;
+            padding: 0.5rem;
+        }
+        
+        .nav-tabs-custom .nav-link {
+            color: white !important;
+            font-weight: 600;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs-custom .nav-link i {
+            color: white;
+        }
+        
+        .nav-tabs-custom .nav-link.active {
+            color: #1e4a3b !important;
+            background: #52b788;
+            border: 2px solid white;
+        }
+        
+        .nav-tabs-custom .nav-link.active i {
+            color: #1e4a3b;
+        }
+        
+        .preview-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid #52b788;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header {
+            background: #e8f5e9;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-right: 5px solid #52b788;
+            font-weight: 700;
+            color: #1e4a3b;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 0.6rem;
+            border: 1px solid #52b788;
+            text-align: right;
+            vertical-align: top;
+        }
+        
+        .data-table th {
+            background: #1e4a3b;
+            color: white;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        .info-table th, .info-table td {
+            padding: 0.5rem;
+            border: 1px solid #e4f2e4;
+            text-align: right;
+        }
+        
+        .info-table th {
+            background: #e8f5e9;
+            color: #1e4a3b;
+            width: 40%;
+        }
+        
+        .channel-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .channel-high { background: #27ae60; color: white; }
+        .channel-medium { background: #f39c12; color: white; }
+        .channel-low { background: #e74c3c; color: white; }
+        
+        .channel-item {
+            background: #f8faf8;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e4f2e4;
+        }
+        
+        /* PDF Export Container */
+        #pdf-export-container {
+            position: fixed;
+            top: -99999px;
+            left: -99999px;
+            width: 800px;
+            background: white;
+            z-index: 9999;
+            padding: 30px;
+            opacity: 0;
+            pointer-events: none;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .pdf-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            direction: rtl;
+        }
+        
+        .pdf-cover {
+            background: linear-gradient(135deg, #0e3b2c 0%, #1b5e3f 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            border: 4px solid #52b788;
+            text-align: center;
+        }
+        
+        .pdf-section-title {
+            color: #1e4a3b;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 25px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #52b788;
+        }
+        
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10px;
+            border: 1px solid #52b788;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .pdf-table th {
+            background: #1e4a3b;
+            color: white;
+            padding: 8px 6px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 10px;
+        }
+        
+        .pdf-table td {
+            padding: 6px;
+            border: 1px solid #e4f2e4;
+            text-align: right;
+            font-size: 9px;
+        }
+        
+        .pdf-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #0e3b2c 0%, #1b5e3f 100%);
+            color: white;
+            border-radius: 15px;
+            border: 2px solid #52b788;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="main-header text-center no-print">
+        <div class="container">
+            <span class="company-badge mb-3">تكاليف | حلول أعمال ذكية</span>
+            <h1 class="display-4 fw-bold mt-3" style="color: white;">
+                <i class="fas fa-comments me-3"></i>
+                استبيان قنوات التواصل مع العملاء
+            </h1>
+            <p class="lead" style="color: white;">خدمة تحصيل الدفعات والفواتير - تحليل قنوات التواصل وتقييم فعاليتها في التحصيل</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs-custom nav-fill" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="data-entry-tab" data-bs-toggle="tab" data-bs-target="#dataEntry" type="button" role="tab">
+                    <i class="fas fa-edit me-2"></i> استبيان المعلومات
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab">
+                    <i class="fas fa-eye me-2"></i> معاينة التقرير
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Tab 1: Data Entry -->
+            <div class="tab-pane fade show active" id="dataEntry" role="tabpanel">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-comments me-2"></i> استبيان قنوات التواصل مع العملاء - تحصيل الدفعات والفواتير
+                    </div>
+                    <div class="card-body">
+                        <!-- بيانات المنشأة -->
+                        <div class="client-info-card">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="client-info-title"><i class="fas fa-building"></i> بيانات المنشأة</div>
+                                    <div class="mb-3"><label class="form-label required-field">اسم المنشأة</label><input type="text" class="form-control" id="companyName" placeholder="أدخل اسم المنشأة"></div>
+                                    <div class="mb-3"><label class="form-label">النشاط الرئيسي</label><input type="text" class="form-control" id="businessActivity" placeholder="مثال: تصنيع / تجارة / خدمات"></div>
+                                    <div class="mb-3"><label class="form-label">حجم المنشأة</label><select class="form-select" id="companySize"><option value="">اختر...</option><option value="صغيرة (أقل من 50 موظف)">صغيرة (أقل من 50 موظف)</option><option value="متوسطة (50-250 موظف)">متوسطة (50-250 موظف)</option><option value="كبيرة (أكثر من 250 موظف)">كبيرة (أكثر من 250 موظف)</option></select></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="client-info-title"><i class="fas fa-address-card"></i> بيانات المسؤول</div>
+                                    <div class="mb-3"><label class="form-label required-field">اسم المسؤول عن التقييم</label><input type="text" class="form-control" id="contactPerson" placeholder="أدخل اسم المسؤول"></div>
+                                    <div class="mb-3"><label class="form-label required-field">المسمى الوظيفي</label><input type="text" class="form-control" id="jobTitle" placeholder="مثال: مدير خدمة العملاء"></div>
+                                    <div class="mb-3"><label class="form-label required-field">البريد الإلكتروني</label><input type="email" class="form-control" id="clientEmail" placeholder="example@company.com"></div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4"><div class="mb-3"><label class="form-label">رقم الهاتف</label><input type="tel" class="form-control" id="clientPhone" placeholder="رقم الهاتف"></div></div>
+                                <div class="col-md-4"><div class="mb-3"><label class="form-label">تاريخ التعبئة</label><input type="date" class="form-control" id="submissionDate" value="2026-03-30"></div></div>
+                                <div class="col-md-4"><div class="mb-3"><label class="form-label">العملة المستخدمة</label><select class="form-select" id="currencySelect"><option value="EGP" selected>جنيه مصري (EGP)</option><option value="SAR">ريال سعودي (SAR)</option><option value="AED">درهم إماراتي (AED)</option><option value="USD">دولار أمريكي (USD)</option></select></div></div>
+                            </div>
+                        </div>
+
+                        <!-- القسم الأول: قنوات التواصل المتاحة -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-list-ul me-2"></i> القسم الأول: قنوات التواصل المتاحة حالياً</h4>
+                            <div class="row">
+                                <div class="col-md-12"><label class="form-label">القنوات المتاحة للتواصل مع العملاء (اختر ما يناسب)</label></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelPhone" value="الهاتف (اتصال صوتي)"><label class="form-check-label">الهاتف (اتصال صوتي)</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelEmail" value="البريد الإلكتروني"><label class="form-check-label">البريد الإلكتروني</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelWhatsapp" value="واتساب"><label class="form-check-label">واتساب</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelSMS" value="رسائل نصية (SMS)"><label class="form-check-label">رسائل نصية (SMS)</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelLetter" value="خطابات رسمية"><label class="form-check-label">خطابات رسمية</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelVisit" value="زيارات ميدانية"><label class="form-check-label">زيارات ميدانية</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelPortal" value="بوابة إلكترونية (Customer Portal)"><label class="form-check-label">بوابة إلكترونية (Customer Portal)</label></div></div>
+                                <div class="col-md-3"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelApp" value="تطبيق جوال"><label class="form-check-label">تطبيق جوال</label></div></div>
+                                <div class="col-md-12"><div class="mb-3 mt-3"><label class="form-label">قنوات أخرى</label><input type="text" class="form-control" id="otherChannels" placeholder="اذكر قنوات أخرى"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- القسم الثاني: تفضيلات العملاء لقنوات التواصل -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-chart-pie me-2"></i> القسم الثاني: تفضيلات العملاء لقنوات التواصل</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">القناة المفضلة لدى العملاء (الأكثر استخداماً)</label><select class="form-select" id="preferredChannel"><option value="">اختر...</option><option value="الهاتف">الهاتف</option><option value="البريد الإلكتروني">البريد الإلكتروني</option><option value="واتساب">واتساب</option><option value="الرسائل النصية">الرسائل النصية</option><option value="الزيارات الميدانية">الزيارات الميدانية</option><option value="البوابة الإلكترونية">البوابة الإلكترونية</option></select></div></div>
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">نسبة العملاء الذين يفضلون التواصل الرقمي</label><input type="text" class="form-control" id="digitalPreference" placeholder="مثال: 65%"></div></div>
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">نسبة العملاء الذين يفضلون التواصل التقليدي</label><input type="text" class="form-control" id="traditionalPreference" placeholder="مثال: 35%"></div></div>
+                                <div class="col-md-12"><div class="mb-3"><label class="form-label">أوقات التواصل المفضلة لدى العملاء</label><select class="form-select" id="preferredTime"><option value="">اختر...</option><option value="الصباح (9ص - 12م)">الصباح (9ص - 12م)</option><option value="بعد الظهر (12م - 4ع)">بعد الظهر (12م - 4ع)</option><option value="المساء (4ع - 8م)">المساء (4ع - 8م)</option><option value="حسب رغبة العميل">حسب رغبة العميل</option></select></div></div>
+                            </div>
+                        </div>
+
+                        <!-- القسم الثالث: فعالية قنوات التواصل -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-chart-line me-2"></i> القسم الثالث: فعالية قنوات التواصل</h4>
+                            <div class="row">
+                                <div class="col-md-12"><label class="form-label">تقييم فعالية القنوات من حيث سرعة الاستجابة ونسبة التحصيل</label></div>
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">أكثر قناة تحقيقاً للتحصيل</label><select class="form-select" id="effectiveChannel"><option value="">اختر...</option><option value="الهاتف">الهاتف</option><option value="البريد الإلكتروني">البريد الإلكتروني</option><option value="واتساب">واتساب</option><option value="الزيارات الميدانية">الزيارات الميدانية</option><option value="الخطابات الرسمية">الخطابات الرسمية</option></select></div></div>
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">نسبة نجاح القناة الأكثر فعالية</label><input type="text" class="form-control" id="effectiveChannelRate" placeholder="مثال: 75%"></div></div>
+                                <div class="col-md-12"><div class="mb-3"><label class="form-label">أقل قناة تحقيقاً للنتائج</label><select class="form-select" id="leastEffectiveChannel"><option value="">اختر...</option><option value="الهاتف">الهاتف</option><option value="البريد الإلكتروني">البريد الإلكتروني</option><option value="واتساب">واتساب</option><option value="الزيارات الميدانية">الزيارات الميدانية</option><option value="الخطابات الرسمية">الخطابات الرسمية</option></select></div></div>
+                            </div>
+                        </div>
+
+                        <!-- القسم الرابع: جودة البيانات والتواصل -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-database me-2"></i> القسم الرابع: جودة بيانات التواصل</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">نسبة بيانات التواصل المحدثة للعملاء</label><input type="text" class="form-control" id="dataUpdatedPercent" placeholder="مثال: 85%"></div></div>
+                                <div class="col-md-6"><div class="mb-3"><label class="form-label">تكرار تحديث بيانات التواصل</label><select class="form-select" id="updateFrequency"><option value="">اختر...</option><option value="شهري">شهري</option><option value="ربع سنوي">ربع سنوي</option><option value="نصف سنوي">نصف سنوي</option><option value="سنوي">سنوي</option><option value="عند الطلب">عند الطلب</option></select></div></div>
+                                <div class="col-md-12"><div class="mb-3"><label class="form-label">آلية تحديث بيانات التواصل</label><textarea class="form-control" id="updateMechanism" rows="2" placeholder="اذكر آلية تحديث بيانات العملاء"></textarea></div></div>
+                            </div>
+                        </div>
+
+                        <!-- القسم الخامس: تحديات التواصل -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-exclamation-triangle me-2"></i> القسم الخامس: تحديات التواصل مع العملاء</h4>
+                            <div class="row">
+                                <div class="col-md-12"><label class="form-label">التحديات التي تواجه فريق التواصل (اختر ما يناسب)</label></div>
+                                <div class="col-md-4"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="challengeReach" value="صعوبة الوصول للعميل"><label class="form-check-label">صعوبة الوصول للعميل</label></div></div>
+                                <div class="col-md-4"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="challengeData" value="بيانات اتصال غير صحيحة"><label class="form-check-label">بيانات اتصال غير صحيحة</label></div></div>
+                                <div class="col-md-4"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="challengeResponse" value="ضعف الرد على محاولات التواصل"><label class="form-check-label">ضعف الرد على محاولات التواصل</label></div></div>
+                                <div class="col-md-4"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="challengeLanguage" value="حاجز اللغة/الثقافة"><label class="form-check-label">حاجز اللغة/الثقافة</label></div></div>
+                                <div class="col-md-4"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="challengeTime" value="تضارب أوقات العمل"><label class="form-check-label">تضارب أوقات العمل</label></div></div>
+                                <div class="col-md-4"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="channelTech" value="ضعف البنية التقنية للقنوات"><label class="form-check-label">ضعف البنية التقنية للقنوات</label></div></div>
+                                <div class="col-md-12"><div class="mb-3 mt-3"><label class="form-label">تحديات أخرى</label><textarea class="form-control" id="otherChallenges" rows="2" placeholder="اذكر تحديات أخرى"></textarea></div></div>
+                            </div>
+                        </div>
+
+                        <!-- القسم السادس: قنوات تواصل مخصصة (ديناميكي) -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-plus-circle me-2"></i> القسم السادس: قنوات تواصل مخصصة (لفئات معينة من العملاء)</h4>
+                            <div id="customChannelsContainer"></div>
+                            <button class="btn btn-custom btn-sm mt-2" onclick="addCustomChannel()"><i class="fas fa-plus-circle me-1"></i> إضافة قناة مخصصة</button>
+                        </div>
+
+                        <!-- القسم السابع: معلومات إضافية -->
+                        <div class="data-entry-section">
+                            <h4 class="mb-4" style="color: #1e4a3b;"><i class="fas fa-info-circle me-2"></i> القسم السابع: معلومات إضافية</h4>
+                            <div class="row">
+                                <div class="col-md-12"><div class="mb-3"><label class="form-label">أي معلومات إضافية حول قنوات التواصل</label><textarea class="form-control" id="additionalInfo" rows="3" placeholder="أي معلومات إضافية"></textarea></div></div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-custom btn-lg" onclick="refreshPreview()"><i class="fas fa-sync-alt me-2"></i> تحديث المعاينة</button>
+                            <button class="btn btn-custom btn-lg mx-2" onclick="resetForm()"><i class="fas fa-undo me-2"></i> إعادة تعيين</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Preview -->
+            <div class="tab-pane fade" id="preview" role="tabpanel">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-file-alt me-2"></i> معاينة تقرير قنوات التواصل مع العملاء</div>
+                    <div class="card-body" id="previewContent"></div>
+                </div>
+                <div class="text-center mb-4 no-print">
+                    <button class="btn btn-excel btn-lg mx-2" onclick="exportToExcel()"><i class="fas fa-file-excel me-2"></i> تصدير (Excel)</button>
+                    <button class="btn btn-pdf btn-lg mx-2" onclick="exportToPDF(event)"><i class="fas fa-file-pdf me-2"></i> تصدير التقرير (PDF)</button>
+                    <button class="btn btn-custom btn-lg mx-2" onclick="window.print()"><i class="fas fa-print me-2"></i> طباعة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer no-print">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4"><h5 style="color: #52b788;">تكاليف - حلول أعمال ذكية</h5><p style="color: #e4f2e4;">نقدم خدمات تحصيل الدفعات والفواتير وتحليل قنوات التواصل.</p></div>
+                <div class="col-md-4 mb-4"><h5 style="color: #52b788;"><i class="fas fa-address-card me-2"></i>معلومات الاتصال</h5><div class="contact-item"><i class="fas fa-map-marker-alt"></i> القاهرة - مصر</div><div class="contact-item"><i class="fas fa-phone-alt"></i><a href="tel:+201044391177" class="footer-links">+20 104 439 1177</a></div><div class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:info@takalief.com" class="footer-links">info@takalief.com</a></div><div class="contact-item"><i class="fas fa-globe"></i><a href="https://www.takalief.com" class="footer-links" target="_blank">www.takalief.com</a></div></div>
+                <div class="col-md-4 mb-4"><h5 style="color: #52b788;"><i class="fas fa-share-alt me-2"></i>تابعنا على</h5><div class="text-center"><a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-icon"><i class="fab fa-twitter"></i></a><a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon"><i class="fab fa-instagram"></i></a><a href="#" class="social-icon"><i class="fab fa-youtube"></i></a><a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a></div></div>
+            </div>
+            <hr>
+            <div class="row mt-3"><div class="col-md-6 text-md-start text-center"><p class="mb-0" style="color: #e4f2e4;"><i class="fas fa-copyright me-2" style="color: #52b788;"></i>2026 تكاليف - حلول أعمال ذكية. جميع الحقوق محفوظة</p></div><div class="col-md-6 text-md-end text-center"><a href="#" class="footer-links me-3">سياسة الخصوصية</a><a href="#" class="footer-links me-3">شروط الاستخدام</a><a href="#" class="footer-links">الدعم الفني</a></div></div>
+        </div>
+    </footer>
+
+    <div id="pdf-export-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let customChannelCount = 1;
+        let selectedCurrency = 'EGP';
+        const currencyNames = { 'EGP': 'جنيه مصري', 'SAR': 'ريال سعودي', 'AED': 'درهم إماراتي', 'USD': 'دولار أمريكي' };
+        
+        document.getElementById('currencySelect').addEventListener('change', function() {
+            selectedCurrency = this.value;
+            refreshPreview();
+        });
+        
+        function addCustomChannel() {
+            customChannelCount++;
+            const container = document.getElementById('customChannelsContainer');
+            const newChannel = document.createElement('div');
+            newChannel.className = 'channel-item';
+            newChannel.id = `customChannel-${customChannelCount}`;
+            newChannel.innerHTML = `
+                <div class="row mb-2">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="اسم القناة" id="channelName${customChannelCount}">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="channelType${customChannelCount}">
+                            <option value="">نوع القناة</option>
+                            <option value="رقمية">رقمية</option>
+                            <option value="تقليدية">تقليدية</option>
+                            <option value="ميدانية">ميدانية</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="channelEffectiveness${customChannelCount}">
+                            <option value="">مستوى الفعالية</option>
+                            <option value="عالية">عالية</option>
+                            <option value="متوسطة">متوسطة</option>
+                            <option value="منخفضة">منخفضة</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-danger btn-sm" onclick="removeCustomChannel(${customChannelCount})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <textarea class="form-control" rows="2" placeholder="وصف القناة والفئة المستهدفة" id="channelDesc${customChannelCount}"></textarea>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newChannel);
+            refreshPreview();
+        }
+        
+        function removeCustomChannel(id) {
+            if (customChannelCount > 1) {
+                const element = document.getElementById(`customChannel-${id}`);
+                if (element) element.remove();
+                refreshPreview();
+            } else {
+                alert("لا يمكن حذف القناة الوحيدة المتبقية");
+            }
+        }
+        
+        function getChannelsList() {
+            const channels = [];
+            const channelIds = ['channelPhone', 'channelEmail', 'channelWhatsapp', 'channelSMS', 'channelLetter', 'channelVisit', 'channelPortal', 'channelApp'];
+            channelIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.checked) channels.push(el.value);
+            });
+            const other = document.getElementById('otherChannels')?.value;
+            if (other) channels.push(other);
+            return channels;
+        }
+        
+        function getChallengesList() {
+            const challenges = [];
+            const challengeIds = ['challengeReach', 'challengeData', 'challengeResponse', 'challengeLanguage', 'challengeTime', 'channelTech'];
+            challengeIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.checked) challenges.push(el.value);
+            });
+            const other = document.getElementById('otherChallenges')?.value;
+            if (other) challenges.push(other);
+            return challenges;
+        }
+        
+        function getCustomChannelsData() {
+            const channels = [];
+            for (let i = 1; i <= customChannelCount; i++) {
+                const nameElem = document.getElementById(`channelName${i}`);
+                const name = nameElem ? nameElem.value : '';
+                if (name) {
+                    const type = document.getElementById(`channelType${i}`) ? document.getElementById(`channelType${i}`).value : '';
+                    const effectiveness = document.getElementById(`channelEffectiveness${i}`) ? document.getElementById(`channelEffectiveness${i}`).value : '';
+                    const desc = document.getElementById(`channelDesc${i}`) ? document.getElementById(`channelDesc${i}`).value : '';
+                    channels.push({ name, type, effectiveness, desc });
+                }
+            }
+            return channels;
+        }
+        
+        function getFieldValue(id, defaultValue = '—') {
+            const element = document.getElementById(id);
+            return element && element.value.trim() !== '' ? element.value.trim() : defaultValue;
+        }
+        
+        function getNumberValue(id, defaultValue = '—') {
+            const element = document.getElementById(id);
+            return element && element.value.trim() !== '' ? element.value : defaultValue;
+        }
+        
+        function getSelectText(id, defaultValue = '—') {
+            const select = document.getElementById(id);
+            if (select && select.options[select.selectedIndex] && select.options[select.selectedIndex].value !== '') {
+                return select.options[select.selectedIndex].text;
+            }
+            return defaultValue;
+        }
+        
+        function getEffectivenessBadge(effectiveness) {
+            if (effectiveness === 'عالية') return '<span class="channel-badge channel-high">عالية</span>';
+            if (effectiveness === 'متوسطة') return '<span class="channel-badge channel-medium">متوسطة</span>';
+            if (effectiveness === 'منخفضة') return '<span class="channel-badge channel-low">منخفضة</span>';
+            return effectiveness;
+        }
+        
+        function formatListTable(items, title) {
+            if (!items.length) return '<span style="color: #dc3545;">لا توجد بيانات محددة</span>';
+            let html = '<table class="data-table"><thead><tr><th style="width:10%">#</th><th>' + title + '</th></tr></thead><tbody>';
+            items.forEach((item, index) => {
+                html += `<tr><td style="text-align:center;">${index + 1}</td><td>${item}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            return html;
+        }
+        
+        function formatCustomChannelsTable() {
+            const channels = getCustomChannelsData();
+            if (!channels.length) return '<span style="color: #dc3545;">لا توجد قنوات مخصصة</span>';
+            let html = '<table class="data-table"><thead><tr><th style="width:5%">#</th><th>اسم القناة</th><th>النوع</th><th>مستوى الفعالية</th><th>الوصف</th></tr></thead><tbody>';
+            channels.forEach((channel, index) => {
+                html += `<tr>
+                    <td style="text-align:center;">${index + 1}</td>
+                    <td>${channel.name}</td>
+                    <td>${channel.type || '—'}</td>
+                    <td>${getEffectivenessBadge(channel.effectiveness)}</td>
+                    <td>${channel.desc || '—'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            return html;
+        }
+        
+        function refreshPreview() {
+            const channels = getChannelsList();
+            const challenges = getChallengesList();
+            
+            const previewHtml = `
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-building me-2"></i> بيانات المنشأة</div>
+                    <table class="info-table">
+                        <tr><th>اسم المنشأة</th><td>${getFieldValue('companyName')}</td></tr>
+                        <tr><th>النشاط الرئيسي</th><td>${getFieldValue('businessActivity')}</td></tr>
+                        <tr><th>حجم المنشأة</th><td>${getSelectText('companySize')}</td></tr>
+                        <tr><th>المسؤول</th><td>${getFieldValue('contactPerson')} (${getFieldValue('jobTitle')})</td></tr>
+                        <tr><th>البريد الإلكتروني</th><td>${getFieldValue('clientEmail')}</td></tr>
+                        <tr><th>رقم الهاتف</th><td>${getFieldValue('clientPhone')}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-list-ul me-2"></i> قنوات التواصل المتاحة حالياً</div>
+                    ${formatListTable(channels, 'القناة')}
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-chart-pie me-2"></i> تفضيلات العملاء لقنوات التواصل</div>
+                    <table class="info-table">
+                        <tr><th>القناة المفضلة لدى العملاء</th><td>${getSelectText('preferredChannel')}</td></tr>
+                        <tr><th>نسبة تفضيل التواصل الرقمي</th><td>${getFieldValue('digitalPreference')}</td></tr>
+                        <tr><th>نسبة تفضيل التواصل التقليدي</th><td>${getFieldValue('traditionalPreference')}</td></tr>
+                        <tr><th>أوقات التواصل المفضلة</th><td>${getSelectText('preferredTime')}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-chart-line me-2"></i> فعالية قنوات التواصل</div>
+                    <table class="info-table">
+                        <tr><th>أكثر قناة تحقيقاً للتحصيل</th><td>${getSelectText('effectiveChannel')}</td></tr>
+                        <tr><th>نسبة نجاح القناة الأكثر فعالية</th><td>${getFieldValue('effectiveChannelRate')}</td></tr>
+                        <tr><th>أقل قناة تحقيقاً للنتائج</th><td>${getSelectText('leastEffectiveChannel')}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-database me-2"></i> جودة بيانات التواصل</div>
+                    <table class="info-table">
+                        <tr><th>نسبة بيانات التواصل المحدثة</th><td>${getFieldValue('dataUpdatedPercent')}</td></tr>
+                        <tr><th>تكرار تحديث البيانات</th><td>${getSelectText('updateFrequency')}</td></tr>
+                        <tr><th>آلية تحديث بيانات التواصل</th><td>${getFieldValue('updateMechanism')}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-exclamation-triangle me-2"></i> تحديات التواصل مع العملاء</div>
+                    ${formatListTable(challenges, 'التحدي')}
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-plus-circle me-2"></i> قنوات تواصل مخصصة</div>
+                    ${formatCustomChannelsTable()}
+                </div>
+                
+                <div class="preview-card">
+                    <div class="section-header"><i class="fas fa-info-circle me-2"></i> معلومات إضافية</div>
+                    <div class="preview-item"><span class="preview-label">ملاحظات</span><span class="preview-value">${getFieldValue('additionalInfo')}</span></div>
+                </div>
+                
+                <div class="preview-card text-center">
+                    <hr>
+                    <p style="color: #1e4a3b;"><i class="fas fa-check-circle me-2"></i>تم تعبئة استبيان قنوات التواصل مع العملاء بنجاح</p>
+                    <p class="text-muted small">تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}</p>
+                </div>
+            `;
+            document.getElementById('previewContent').innerHTML = previewHtml;
+        }
+        
+        function resetForm() { if(confirm('هل أنت متأكد من إعادة تعيين جميع البيانات؟')) location.reload(); }
+        
+        function exportToExcel() {
+            const companyName = getFieldValue('companyName', 'منشأة');
+            const channels = getChannelsList();
+            const challenges = getChallengesList();
+            const customChannels = getCustomChannelsData();
+            
+            const excelData = [
+                ['استبيان قنوات التواصل مع العملاء', 'خدمة تحصيل الدفعات والفواتير'],
+                ['تاريخ التقرير', new Date().toLocaleDateString('ar-EG')],
+                ['اسم المنشأة', companyName],
+                ['المسؤول', getFieldValue('contactPerson')],
+                ['المسمى الوظيفي', getFieldValue('jobTitle')],
+                ['البريد الإلكتروني', getFieldValue('clientEmail')],
+                ['رقم الهاتف', getFieldValue('clientPhone')],
+                [], ['1. قنوات التواصل المتاحة:', ''],
+                ...channels.map((c, i) => [`قناة ${i+1}`, c]),
+                [], ['2. تفضيلات العملاء:', ''],
+                ['القناة المفضلة', getSelectText('preferredChannel')],
+                ['نسبة تفضيل التواصل الرقمي', getFieldValue('digitalPreference')],
+                ['نسبة تفضيل التواصل التقليدي', getFieldValue('traditionalPreference')],
+                ['أوقات التواصل المفضلة', getSelectText('preferredTime')],
+                [], ['3. فعالية قنوات التواصل:', ''],
+                ['أكثر قناة تحقيقاً للتحصيل', getSelectText('effectiveChannel')],
+                ['نسبة نجاح القناة الأكثر فعالية', getFieldValue('effectiveChannelRate')],
+                ['أقل قناة تحقيقاً للنتائج', getSelectText('leastEffectiveChannel')],
+                [], ['4. جودة بيانات التواصل:', ''],
+                ['نسبة بيانات التواصل المحدثة', getFieldValue('dataUpdatedPercent')],
+                ['تكرار تحديث البيانات', getSelectText('updateFrequency')],
+                ['آلية تحديث البيانات', getFieldValue('updateMechanism')],
+                [], ['5. تحديات التواصل:', ''],
+                ...challenges.map((ch, i) => [`تحدي ${i+1}`, ch]),
+                [], ['6. قنوات تواصل مخصصة:', ''],
+                ['اسم القناة', 'النوع', 'مستوى الفعالية', 'الوصف'],
+                ...customChannels.map(c => [c.name, c.type || '—', c.effectiveness || '—', c.desc || '—']),
+                [], ['7. معلومات إضافية:', ''],
+                ['ملاحظات', getFieldValue('additionalInfo')],
+                [], ['للتواصل: info@takalief.com | +20 104 439 1177'], ['www.takalief.com']
+            ];
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            ws['!cols'] = [{wch:30}, {wch:35}];
+            XLSX.utils.book_append_sheet(wb, ws, 'قنوات_التواصل');
+            XLSX.writeFile(wb, `Communication_Channels_${companyName.replace(/\s/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            alert('تم تصدير استبيان Excel بنجاح');
+        }
+        
+        async function exportToPDF(event) {
+            try {
+                const exportBtn = event.target;
+                const originalText = exportBtn.innerHTML;
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> جاري إعداد التقرير...';
+                exportBtn.disabled = true;
+                
+                const pdfContainer = document.getElementById('pdf-export-container');
+                pdfContainer.innerHTML = '';
+                pdfContainer.style.opacity = '1';
+                pdfContainer.style.position = 'absolute';
+                pdfContainer.style.top = '0';
+                pdfContainer.style.left = '0';
+                pdfContainer.style.zIndex = '9999';
+                
+                const companyName = getFieldValue('companyName', 'غير محدد');
+                const contactPerson = getFieldValue('contactPerson', 'غير محدد');
+                const currentDate = new Date().toLocaleDateString('ar-EG');
+                const channels = getChannelsList();
+                const challenges = getChallengesList();
+                const customChannels = getCustomChannelsData();
+                
+                function buildListRows(items) {
+                    if (!items.length) return '<tr><td colspan="2" style="text-align:center;">لا توجد بيانات محددة</td></tr>';
+                    let rows = '';
+                    items.forEach((item, i) => {
+                        rows += `<tr><td style="text-align:center; width:10%;">${i+1}</td><td style="text-align:right;">${item}</td></tr>`;
+                    });
+                    return rows;
+                }
+                
+                function buildCustomRows() {
+                    if (!customChannels.length) return '<tr><td colspan="5" style="text-align:center;">لا توجد قنوات مخصصة</td></tr>';
+                    let rows = '';
+                    customChannels.forEach((channel, i) => {
+                        let effectivenessDisplay = channel.effectiveness;
+                        if (channel.effectiveness === 'عالية') effectivenessDisplay = 'عالية';
+                        else if (channel.effectiveness === 'متوسطة') effectivenessDisplay = 'متوسطة';
+                        else if (channel.effectiveness === 'منخفضة') effectivenessDisplay = 'منخفضة';
+                        rows += `<tr>
+                            <td style="text-align:center;">${i+1}</td>
+                            <td style="text-align:right;">${channel.name}</td>
+                            <td style="text-align:center;">${channel.type || '—'}</td>
+                            <td style="text-align:center;">${effectivenessDisplay}</td>
+                            <td style="text-align:right;">${channel.desc || '—'}</td>
+                        </tr>`;
+                    });
+                    return rows;
+                }
+                
+                const pdfWrapper = document.createElement('div');
+                pdfWrapper.className = 'pdf-wrapper';
+                pdfWrapper.innerHTML = `
+                    <div class="pdf-cover">
+                        <h1>استبيان قنوات التواصل مع العملاء</h1>
+                        <h3>خدمة تحصيل الدفعات والفواتير</h3>
+                        <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin-top: 30px; border: 2px solid #52b788;">
+                            <p style="font-size: 16px;">المنشأة: ${companyName}</p>
+                            <p style="font-size: 14px;">المسؤول: ${contactPerson}</p>
+                            <p style="font-size: 14px;">تاريخ التقرير: ${currentDate}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="page-break-before: always;">
+                        <h2 class="pdf-section-title">بيانات المنشأة</h2>
+                        <table class="pdf-table"><tr><th style="width:35%">البيان</th><th>القيمة</th></tr>
+                            <tr><td style="text-align:right;">اسم المنشأة</td><td style="text-align:right;">${getFieldValue('companyName')}</td></tr>
+                            <tr><td style="text-align:right;">النشاط الرئيسي</td><td style="text-align:right;">${getFieldValue('businessActivity')}</td></tr>
+                            <tr><td style="text-align:right;">حجم المنشأة</td><td style="text-align:right;">${getSelectText('companySize')}</td></tr>
+                            <tr><td style="text-align:right;">المسؤول</td><td style="text-align:right;">${getFieldValue('contactPerson')} (${getFieldValue('jobTitle')})</td></tr>
+                            <tr><td style="text-align:right;">البريد الإلكتروني</td><td style="text-align:right;">${getFieldValue('clientEmail')}</td></tr>
+                            <tr><td style="text-align:right;">رقم الهاتف</td><td style="text-align:right;">${getFieldValue('clientPhone')}</td></tr>
+                        </table>
+                        
+                        <h2 class="pdf-section-title">قنوات التواصل المتاحة حالياً</h2>
+                        <table class="pdf-table"><tr><th style="width:10%">م</th><th>القناة</th></tr>${buildListRows(channels)}</table>
+                        
+                        <h2 class="pdf-section-title">تفضيلات العملاء لقنوات التواصل</h2>
+                        <table class="pdf-table"><tr><th style="width:35%">البيان</th><th>القيمة</th></tr>
+                            <tr><td style="text-align:right;">القناة المفضلة لدى العملاء</td><td style="text-align:right;">${getSelectText('preferredChannel')}</td></tr>
+                            <tr><td style="text-align:right;">نسبة تفضيل التواصل الرقمي</td><td style="text-align:right;">${getFieldValue('digitalPreference')}</td></tr>
+                            <tr><td style="text-align:right;">نسبة تفضيل التواصل التقليدي</td><td style="text-align:right;">${getFieldValue('traditionalPreference')}</td></tr>
+                            <tr><td style="text-align:right;">أوقات التواصل المفضلة</td><td style="text-align:right;">${getSelectText('preferredTime')}</td></tr>
+                        </table>
+                        
+                        <h2 class="pdf-section-title">فعالية قنوات التواصل</h2>
+                        <table class="pdf-table"><tr><th style="width:35%">البيان</th><th>القيمة</th></tr>
+                            <tr><td style="text-align:right;">أكثر قناة تحقيقاً للتحصيل</td><td style="text-align:right;">${getSelectText('effectiveChannel')}</td></tr>
+                            <tr><td style="text-align:right;">نسبة نجاح القناة الأكثر فعالية</td><td style="text-align:right;">${getFieldValue('effectiveChannelRate')}</td></tr>
+                            <td><td style="text-align:right;">أقل قناة تحقيقاً للنتائج</td><td style="text-align:right;">${getSelectText('leastEffectiveChannel')}</td></tr>
+                        </table>
+                        
+                        <h2 class="pdf-section-title">جودة بيانات التواصل</h2>
+                        <table class="pdf-table"><tr><th style="width:35%">البيان</th><th>القيمة</th></tr>
+                            <tr><td style="text-align:right;">نسبة بيانات التواصل المحدثة</td><td style="text-align:right;">${getFieldValue('dataUpdatedPercent')}</td></tr>
+                            <tr><td style="text-align:right;">تكرار تحديث البيانات</td><td style="text-align:right;">${getSelectText('updateFrequency')}</td></tr>
+                            <tr><td style="text-align:right;">آلية تحديث بيانات التواصل</td><td style="text-align:right;">${getFieldValue('updateMechanism')}</td></tr>
+                        </table>
+                        
+                        <h2 class="pdf-section-title">تحديات التواصل مع العملاء</h2>
+                        <table class="pdf-table"><tr><th style="width:10%">م</th><th>التحدي</th></tr>${buildListRows(challenges)}</table>
+                        
+                        <h2 class="pdf-section-title">قنوات تواصل مخصصة</h2>
+                        <table class="pdf-table">
+                            <tr><th style="width:5%">م</th><th>اسم القناة</th><th>النوع</th><th>مستوى الفعالية</th><th>الوصف</th></tr>
+                            ${buildCustomRows()}
+                        </table>
+                        
+                        <h2 class="pdf-section-title">معلومات إضافية</h2>
+                        <table class="pdf-table"><tr><th style="width:35%">البيان</th><th>القيمة</th></tr>
+                            <tr><td style="text-align:right;">ملاحظات</td><td style="text-align:right;">${getFieldValue('additionalInfo')}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div style="page-break-before: always; margin-top: 40px;">
+                        <div class="pdf-footer">
+                            <div style="font-size: 18px; font-weight: 700; color: #52b788;">تكاليف - حلول أعمال ذكية</div>
+                            <div>القاهرة - مصر | +20 104 439 1177 | info@takalief.com</div>
+                            <hr style="width: 150px; margin: 15px auto; border: 1px solid #52b788;">
+                            <p>تم تعبئة هذا الاستبيان لتحليل قنوات التواصل مع العملاء</p>
+                            <p>تاريخ الإصدار: ${currentDate}</p>
+                            <p style="margin-top: 20px;">توقيع المسؤول: _________________________</p>
+                            <p>جميع الحقوق محفوظة © 2026</p>
+                        </div>
+                    </div>
+                `;
+                
+                pdfContainer.appendChild(pdfWrapper);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const canvas = await html2canvas(pdfContainer, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+                const { jsPDF } = window.jspdf;
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+                heightLeft -= pageHeight;
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+                    heightLeft -= pageHeight;
+                }
+                
+                pdf.save(`Communication_Channels_${companyName.replace(/[^\u0600-\u06FFa-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`);
+                
+                pdfContainer.innerHTML = '';
+                pdfContainer.style.opacity = '0';
+                pdfContainer.style.position = 'fixed';
+                pdfContainer.style.top = '-99999px';
+                
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+                alert('تم تصدير التقرير بنجاح');
+            } catch (error) {
+                console.error('PDF Error:', error);
+                alert('حدث خطأ: ' + error.message);
+                const exportBtn = event.target;
+                exportBtn.innerHTML = '<i class="fas fa-file-pdf me-2"></i> تصدير التقرير (PDF)';
+                exportBtn.disabled = false;
+            }
+        }
+        
+        function init() {
+            const container = document.getElementById('customChannelsContainer');
+            container.innerHTML = '';
+            const firstChannel = document.createElement('div');
+            firstChannel.className = 'channel-item';
+            firstChannel.id = 'customChannel-1';
+            firstChannel.innerHTML = `
+                <div class="row mb-2">
+                    <div class="col-md-4"><input type="text" class="form-control" placeholder="اسم القناة" id="channelName1"></div>
+                    <div class="col-md-3"><select class="form-select" id="channelType1"><option value="">نوع القناة</option><option value="رقمية">رقمية</option><option value="تقليدية">تقليدية</option><option value="ميدانية">ميدانية</option></select></div>
+                    <div class="col-md-4"><select class="form-select" id="channelEffectiveness1"><option value="">مستوى الفعالية</option><option value="عالية">عالية</option><option value="متوسطة">متوسطة</option><option value="منخفضة">منخفضة</option></select></div>
+                    <div class="col-md-1"><button class="btn btn-danger btn-sm" onclick="removeCustomChannel(1)" style="display:none;"><i class="fas fa-trash"></i></button></div>
+                </div>
+                <div class="row"><div class="col-md-12"><textarea class="form-control" rows="2" placeholder="وصف القناة والفئة المستهدفة" id="channelDesc1"></textarea></div></div>
+            `;
+            container.appendChild(firstChannel);
+            customChannelCount = 1;
+            refreshPreview();
+            const today = new Date().toISOString().split('T')[0];
+            if (document.getElementById('submissionDate')) document.getElementById('submissionDate').value = today;
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
